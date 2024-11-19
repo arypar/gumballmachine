@@ -2,6 +2,8 @@ import '@rainbow-me/rainbowkit/styles.css';
 import {
   getDefaultConfig,
   RainbowKitProvider,
+  darkTheme,
+  lightTheme,
 } from '@rainbow-me/rainbowkit';
 import { WagmiProvider } from 'wagmi';
 import {
@@ -11,7 +13,7 @@ import {
   QueryClientProvider,
   QueryClient,
 } from "@tanstack/react-query";
-
+import { useTheme } from "next-themes"; 
 
 const config = getDefaultConfig({
   appName: 'My RainbowKit App',
@@ -22,13 +24,14 @@ const config = getDefaultConfig({
 
 export default function WalletProvider({ children }: { children: React.ReactNode }) {
   const queryClient = new QueryClient();
-
+  const { theme } = useTheme();
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
       <RainbowKitProvider
           coolMode
           showRecentTransactions={true}
+          theme={theme === "dark" ? darkTheme() : lightTheme()}
         >
           {children}</RainbowKitProvider>
       </QueryClientProvider>
