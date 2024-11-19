@@ -1,8 +1,6 @@
 "use client";
 
-import Image from "next/image";
 import WalletProvider from "../components/wallet-provider";
-import { ConnectButton } from '@rainbow-me/rainbowkit';
 import NavigationHeader from "@/components/NavigationHeader";
 import Gumballs from "@/components/Gumballs";
 

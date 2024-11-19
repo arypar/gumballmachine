@@ -2,27 +2,50 @@ import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
-import { useAccount, useContractRead, useContractWrite, useWriteContract } from "wagmi";
+import {
+    Form,
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormMessage,
+  } from "@/components/ui/form"
+import { useWriteContract } from "wagmi";
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
+
 
 
 const contractABI = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[{"internalType":"uint256","name":"_gumballs","type":"uint256"}],"name":"addGumballs","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"getGumballs","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"playGumballsMachine","outputs":[],"stateMutability":"nonpayable","type":"function"}];
 const contractAddress = '0xdc8fd0a4e818c6e1a82af53d7ef8affd411e92e8';
 
+const formSchema = z.object({
+    count: z
+      .string()
+      .transform((v) => Number(v) || 0)
+      .refine((v) => v >= 1, { message: "Count must be greater than or equal to 1" }),
+  });
+
+
+
 export function AddGumballs() {
+    const form = useForm<z.infer<typeof formSchema>>({
+        resolver: zodResolver(formSchema),
+      })
+
     const { writeContract } = useWriteContract();
-async function addGumballs(gumballs: number) {
-    const response = await writeContract({
+async function addGumballs(values: z.infer<typeof formSchema>) {
+    await writeContract({
       address: contractAddress,
       abi: contractABI,
       functionName: "addGumballs",
-      args: [gumballs],
+      args: [values.count],
     });
   }
   return (
@@ -35,21 +58,27 @@ async function addGumballs(gumballs: number) {
           <DialogTitle className="text-center">Enter Gumball Count</DialogTitle>
         </DialogHeader>
         <div className="flex justify-center py-4">
-          <Input
-            id="gumballs"
-            defaultValue="1"
-            className="w-3/4"
+
+        <Form {...form}>
+        <form onSubmit={form.handleSubmit(addGumballs)} className="space-y-8">
+          <FormField
+            control={form.control}
+            name="count"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input placeholder="1" {...field} />
+                </FormControl>
+                <FormDescription>
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
           />
+          <Button type="submit">Submit</Button>
+        </form>
+      </Form>
         </div>
-          <Button type="submit" className="w-auto" onClick={() => {
-            const gumballInput = document.getElementById("gumballs") as HTMLInputElement;
-            const gumballCount = parseInt(gumballInput.value); 
-            addGumballs(gumballCount);
-          const dialog = document.querySelector('[role="dialog"]');
-          if (dialog) {
-            dialog.dispatchEvent(new Event('close'));
-          }
-          }}>Add Gumballs</Button>
       </DialogContent>
     </Dialog>
   )

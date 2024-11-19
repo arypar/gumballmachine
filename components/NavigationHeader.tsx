@@ -14,7 +14,7 @@ const NavigationHeader: React.FC = () => {
         </Link>
         <ul className="flex space-x-4 items-center">
             <li>
-                <ConnectButton />
+                    <ConnectButton />
             </li>
           <li>
             <ModeToggle />
